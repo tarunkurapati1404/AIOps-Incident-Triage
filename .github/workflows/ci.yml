@@ -1,0 +1,7 @@
+name: placeholder
+on: [push]
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Real CI pipeline arrives in Step 2"
