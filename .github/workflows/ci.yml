@@ -59,6 +59,12 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: python triage/analyzer.py
 
+      - name: Email triage report to on-call
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python triage/notify.py
+
       - name: Upload triage report
         uses: actions/upload-artifact@v4
         with:
