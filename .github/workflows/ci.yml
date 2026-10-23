@@ -24,9 +24,43 @@ jobs:
           docker cp testrun:/app/test-results.xml ./test-results.xml
           docker rm testrun
 
-      - name: Upload test report (even on failure)
+      - name: Upload test report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: test-results.xml
+
+  triage:
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Download test report
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+
+      - name: Run AI triage
+        env:
+          LLM_PROVIDER: openai
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python triage/analyzer.py
+
+      - name: Upload triage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: triage-report
+          path: triage-report.md
